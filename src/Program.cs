@@ -10,16 +10,36 @@
 
     internal class Program
     {
-        private static string apiKey = @"{{the api key}}";
+        /// <summary>
+        /// Set the key to access Fiery API
+        /// </summary>
+        private static string apiKey = @"the_api_key";
 
-        private static string hostname = "{{the server name or ip address}}";
+        /// <summary>
+        /// Set the host name as fiery server name or ip address
+        /// </summary>
+        private static string hostname = "the_server_name_or_ip_address";
 
-        private static string jobId = "{{job id}}";
+        /// <summary>
+        /// Set the job id on the fiery to retrieve job information and preview
+        /// </summary>
+        private static string jobId = "the_job_id";
 
-        private static string password = "{{the password}}";
+        /// <summary>
+        /// Set the password to login to the fiery
+        /// </summary>
+        private static string password = "the_password";
 
-        private static string username = "{{the username}}";
+        /// <summary>
+        /// Set the username to login to the fiery
+        /// </summary>
+        private static string username = "the_username";
 
+        /// <summary>
+        /// Set the first page preview of the job
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task GetJobPreviewSampleAsync(HttpClient client)
         {
             var response = await client.GetAsync("jobs/" + jobId + "/preview/1");
@@ -31,6 +51,11 @@
             Console.WriteLine(uri);
         }
 
+        /// <summary>
+        /// Get job information from all jobs on the fiery
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task GetJobsSampleAsync(HttpClient client)
         {
             var response = await client.GetAsync("jobs");
@@ -40,6 +65,11 @@
             Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Get job information of a single job on the fiery
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task GetSingleJobSampleAsync(HttpClient client)
         {
             var response = await client.GetAsync("jobs/" + jobId);
@@ -49,6 +79,11 @@
             Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Login to the fiery
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task<HttpClient> LoginSampleAsync()
         {
             var loginJson = new JObject();
@@ -71,6 +106,11 @@
             return client;
         }
 
+        /// <summary>
+        /// Logout from the fiery
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task LogoutSampleAsync(HttpClient client)
         {
             var response = await client.PostAsync("logout", null);
@@ -80,12 +120,21 @@
             Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Entry point of the application
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
         private static void Main(string[] args)
         {
             System.Net.ServicePointManager.ServerCertificateValidationCallback = ValidateCertificate;
             RunSampleAsync().Wait();
         }
 
+        /// <summary>
+        /// Send a print action to a job on the fiery
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task PrintJobSampleAsync(HttpClient client)
         {
             var response = await client.PutAsync("jobs/" + jobId + "/print", null);
@@ -95,6 +144,10 @@
             Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Main method executing all sample code
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task RunSampleAsync()
         {
             var client = await LoginSampleAsync();
@@ -105,6 +158,14 @@
             await LogoutSampleAsync(client);
         }
 
+        /// <summary>
+        /// Ignore all certificates errors when sending request to the Fiery. Using this method without validation on production environment will increase the risk of MITM attack.
+        /// </summary>
+        /// <param name="sender">An object that contains state information for this validation.</param>
+        /// <param name="certificate">The certificate used to authenticate the remote party.</param>
+        /// <param name="chain">The chain of certificate authorities associated with the remote certificate.</param>
+        /// <param name="sslPolicyErrors">One or more errors associated with the remote certificate.</param>
+        /// <returns>A value that determines whether the specified certificate is accepted for authentication.</returns>
         private static bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;
