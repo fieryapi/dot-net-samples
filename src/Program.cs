@@ -1,6 +1,7 @@
 ﻿namespace EFI.Sample
 {
     using System;
+    using System.IO;
     using System.Net.Http;
     using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
@@ -16,22 +17,27 @@
         private static string apiKey = @"the_api_key";
 
         /// <summary>
+        /// Set the full file path for job submission
+        /// </summary>
+        private static string fullPath = @"the_job_content_full_file_path";
+
+        /// <summary>
         /// Set the host name as fiery server name or ip address
         /// </summary>
         private static string hostname = "the_server_name_or_ip_address";
 
         /// <summary>
-        /// Set the job id on the fiery to retrieve job information and preview
+        /// Set the job id on the fiery server to retrieve job information and preview
         /// </summary>
         private static string jobId = "the_job_id";
 
         /// <summary>
-        /// Set the password to login to the fiery
+        /// Set the password to login to the fiery server
         /// </summary>
         private static string password = "the_password";
 
         /// <summary>
-        /// Set the username to login to the fiery
+        /// Set the username to login to the fiery server
         /// </summary>
         private static string username = "the_username";
 
@@ -52,7 +58,7 @@
         }
 
         /// <summary>
-        /// Get job information from all jobs on the fiery
+        /// Get job information from all jobs on the fiery server
         /// </summary>
         /// <param name="client">The HTTP client with valid session.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -66,7 +72,7 @@
         }
 
         /// <summary>
-        /// Get job information of a single job on the fiery
+        /// Get job information of a single job on the fiery server
         /// </summary>
         /// <param name="client">The HTTP client with valid session.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -80,7 +86,7 @@
         }
 
         /// <summary>
-        /// Login to the fiery
+        /// Login to the fiery server
         /// </summary>
         /// <param name="client">The HTTP client with valid session.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -107,7 +113,7 @@
         }
 
         /// <summary>
-        /// Logout from the fiery
+        /// Logout from the fiery server
         /// </summary>
         /// <param name="client">The HTTP client with valid session.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -131,7 +137,27 @@
         }
 
         /// <summary>
-        /// Send a print action to a job on the fiery
+        /// Create a new job on the fiery server
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        private static async Task PostJobContentSampleAsync(HttpClient client)
+        {
+            using (var s = new FileStream(fullPath, FileMode.Open))
+            {
+                var request = new MultipartFormDataContent();
+                request.Add(new StreamContent(s), "file", Path.GetFileName(fullPath));
+
+                var response = await client.PostAsync("jobs", request);
+
+                Console.WriteLine();
+                Console.WriteLine("Submit a new job");
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        /// <summary>
+        /// Send a print action to a job on the fiery server
         /// </summary>
         /// <param name="client">The HTTP client with valid session.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -151,6 +177,7 @@
         private static async Task RunSampleAsync()
         {
             var client = await LoginSampleAsync();
+            await PostJobContentSampleAsync(client);
             await GetJobsSampleAsync(client);
             await GetSingleJobSampleAsync(client);
             await PrintJobSampleAsync(client);
@@ -159,7 +186,7 @@
         }
 
         /// <summary>
-        /// Ignore all certificates errors when sending request to the Fiery. Using this method without validation on production environment will increase the risk of MITM attack.
+        /// Ignore all certificates errors when sending request to the fiery server. Using this method without validation on production environment will increase the risk of MITM attack.
         /// </summary>
         /// <param name="sender">An object that contains state information for this validation.</param>
         /// <param name="certificate">The certificate used to authenticate the remote party.</param>

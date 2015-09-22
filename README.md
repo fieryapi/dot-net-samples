@@ -33,6 +33,20 @@ var response = await client.PostAsync("logout", request);
 ```
 
 
+### Create a new job
+
+```csharp
+var fullPath = @"the_job_content_full_file_path";  // e.g. d:\business_card.pdf
+using (var s = new FileStream(fullPath, FileMode.Open))
+{
+    var request = new MultipartFormDataContent();
+    request.Add(new StreamContent(s), "file", Path.GetFileName(fullPath));
+
+    var response = await client.PostAsync("jobs", request);
+}
+```
+
+
 ### Get jobs
 
 ```csharp
@@ -43,7 +57,7 @@ var response = await client.GetAsync("jobs");
 ### Get single job
 
 ```csharp
-var jobId = "the_job_id"; // e.g. 00000000.558895DF.16055
+var jobId = "the_job_id";  // e.g. 00000000.558895DF.16055
 var response = await client.GetAsync("jobs/" + jobId);
 ```
 
@@ -51,7 +65,7 @@ var response = await client.GetAsync("jobs/" + jobId);
 ### Print a job
 
 ```csharp
-var jobId = "the_job_id"; // e.g. 00000000.558895DF.16055
+var jobId = "the_job_id";  // e.g. 00000000.558895DF.16055
 var response = await client.PutAsync("jobs/" + jobId + "/print", null);
 ```
 
@@ -59,6 +73,6 @@ var response = await client.PutAsync("jobs/" + jobId + "/print", null);
 ### Get job preview
 
 ```csharp
-var jobId = "the_job_id"; // e.g. 00000000.558895DF.16055
+var jobId = "the_job_id";  // e.g. 00000000.558895DF.16055
 var response = await client.GetAsync("jobs/" + jobId + "/preview/1");
 ```
