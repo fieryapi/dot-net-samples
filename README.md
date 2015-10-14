@@ -42,6 +42,9 @@ using (var s = new FileStream(fullPath, FileMode.Open))
     var request = new MultipartFormDataContent();
     request.Add(new StreamContent(s), "file", Path.GetFileName(fullPath));
 
+    // override default number of copies to 10 copies
+    request.Add(new StringContent("10"), "\"attributes[num copies]\"");
+
     var response = await client.PostAsync("jobs", request);
 }
 ```
@@ -59,6 +62,22 @@ var response = await client.GetAsync("jobs");
 ```csharp
 var jobId = "the_job_id";  // e.g. 00000000.558895DF.16055
 var response = await client.GetAsync("jobs/" + jobId);
+```
+
+
+### Update attributes of a job
+
+```csharp
+var jobId = "the_job_id";  // e.g. 00000000.558895DF.16055
+
+var attributeJson = new JObject();
+attributeJson["num copies"] = "1";
+
+var jobJson = new JObject();
+jobJson["attributes"] = attributeJson;
+
+var request = new StringContent(jobJson.ToString(), Encoding.UTF8, "application/json");
+var response = await client.PutAsync("jobs/" + jobId, request);
 ```
 
 

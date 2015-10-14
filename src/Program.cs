@@ -148,6 +148,9 @@
                 var request = new MultipartFormDataContent();
                 request.Add(new StreamContent(s), "file", Path.GetFileName(fullPath));
 
+                // override default number of copies to 10 copies
+                request.Add(new StringContent("10"), "\"attributes[num copies]\"");
+
                 var response = await client.PostAsync("jobs", request);
 
                 Console.WriteLine();
@@ -176,13 +179,40 @@
         /// <returns>The task object representing the asynchronous operation.</returns>
         private static async Task RunSampleAsync()
         {
+
             var client = await LoginSampleAsync();
             await PostJobContentSampleAsync(client);
             await GetJobsSampleAsync(client);
             await GetSingleJobSampleAsync(client);
+            await UpdateJobAttributeAsync(client);
             await PrintJobSampleAsync(client);
             await GetJobPreviewSampleAsync(client);
             await LogoutSampleAsync(client);
+        }
+
+        /// <summary>
+        /// Update a job attribute value on the fiery server.
+        /// </summary>
+        /// <param name="client">The HTTP client with valid session.</param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        private static async Task UpdateJobAttributeAsync(HttpClient client)
+        {
+            ////// note - multipart/form-data is supported but not recommended.
+            ////var request = new MultipartFormDataContent();
+            ////request.Add(new StringContent("1"), "\"attributes[num copies]\"");
+
+            var attributeJson = new JObject();
+            attributeJson["num copies"] = "1";
+
+            var jobJson = new JObject();
+            jobJson["attributes"] = attributeJson;
+
+            var request = new StringContent(jobJson.ToString(), Encoding.UTF8, "application/json");
+            var response = await client.PutAsync("jobs/" + jobId, request);
+
+            Console.WriteLine();
+            Console.WriteLine("Update a job");
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
         }
 
         /// <summary>
