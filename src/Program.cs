@@ -99,7 +99,7 @@
 
             var serverAddress = string.Format(
                 System.Globalization.CultureInfo.InvariantCulture,
-                "https://{0}/live/api/v2/",
+                "https://{0}/live/api/v3/",
                 hostname);
             var client = new HttpClient { BaseAddress = new Uri(serverAddress) };
 
